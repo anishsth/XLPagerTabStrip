@@ -56,6 +56,23 @@ open class ButtonBarView: UICollectionView {
             updateSelectedBarYPosition()
         }
     }
+
+    internal var selectedBarWidth: CGFloat = 0 {
+        didSet {
+            updateSelectedBarXPosition()
+        }
+    }
+    internal var selectedBarTopOffset: CGFloat = 0 {
+        didSet {
+            updateSelectedBarYPosition()
+        }
+    }
+    internal var selectedBarHasRoundedCorners = false {
+        didSet {
+            updateCornerRadius()
+        }
+    }
+
     var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
     var selectedBarAlignment: SelectedBarAlignment = .center
     var selectedIndex = 0
@@ -120,7 +137,10 @@ open class ButtonBarView: UICollectionView {
         let attributes = layoutAttributesForItem(at: selectedCellIndexPath)
         let selectedCellFrame = attributes!.frame
 
-        updateContentOffset(animated: animated, pagerScroll: pagerScroll, toFrame: selectedCellFrame, toIndex: (selectedCellIndexPath as NSIndexPath).row)
+        updateContentOffset(animated: animated,
+                            pagerScroll: pagerScroll,
+                            toFrame: selectedCellFrame,
+                            toIndex: (selectedCellIndexPath as NSIndexPath).row)
 
         selectedBarFrame.size.width = selectedCellFrame.size.width
         selectedBarFrame.origin.x = selectedCellFrame.origin.x
@@ -137,8 +157,14 @@ open class ButtonBarView: UICollectionView {
     // MARK: - Helpers
 
     private func updateContentOffset(animated: Bool, pagerScroll: PagerScroll, toFrame: CGRect, toIndex: Int) {
-        guard pagerScroll != .no || (pagerScroll != .scrollOnlyIfOutOfScreen && (toFrame.origin.x < contentOffset.x || toFrame.origin.x >= (contentOffset.x + frame.size.width - contentInset.left))) else { return }
-        let targetContentOffset = contentSize.width > frame.size.width ? contentOffsetForCell(withFrame: toFrame, andIndex: toIndex) : 0
+        guard pagerScroll != .no ||
+            (
+                pagerScroll != .scrollOnlyIfOutOfScreen &&
+                    (toFrame.origin.x < contentOffset.x ||
+                            toFrame.origin.x >= (contentOffset.x + frame.size.width - contentInset.left))
+            ) else { return }
+        let targetContentOffset = contentSize.width > frame.size.width ?
+            contentOffsetForCell(withFrame: toFrame, andIndex: toIndex) : 0
         setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: animated)
     }
 
@@ -159,7 +185,8 @@ open class ButtonBarView: UICollectionView {
             let rightAlignmentOffset = frame.size.width - sectionInset.right - cellHalfWidth
             let numberOfItems = dataSource!.collectionView(self, numberOfItemsInSection: 0)
             let progress = index / (numberOfItems - 1)
-            alignmentOffset = leftAlignmentOffset + (rightAlignmentOffset - leftAlignmentOffset) * CGFloat(progress) - cellHalfWidth
+            alignmentOffset = leftAlignmentOffset +
+                (rightAlignmentOffset - leftAlignmentOffset) * CGFloat(progress) - cellHalfWidth
         }
 
         var contentOffset = cellFrame.origin.x - alignmentOffset
@@ -175,13 +202,25 @@ open class ButtonBarView: UICollectionView {
         case .top:
             selectedBarFrame.origin.y = 0
         case .middle:
-            selectedBarFrame.origin.y = (frame.size.height - selectedBarHeight) / 2
+            selectedBarFrame.origin.y = ((frame.size.height - selectedBarHeight) / 2) + selectedBarTopOffset
         case .bottom:
-            selectedBarFrame.origin.y = frame.size.height - selectedBarHeight
+            selectedBarFrame.origin.y = frame.size.height - selectedBarHeight + selectedBarTopOffset
         }
 
         selectedBarFrame.size.height = selectedBarHeight
         selectedBar.frame = selectedBarFrame
+    }
+    
+    private func updateSelectedBarXPosition() {
+        var selectedBarFrame = selectedBar.frame
+        selectedBarFrame.origin.x = (frame.size.width - selectedBarWidth) / 2
+        selectedBarFrame.size.width = selectedBarWidth
+        selectedBar.frame = selectedBarFrame
+    }
+    
+    private func updateCornerRadius() {
+        selectedBar.clipsToBounds = true
+        selectedBar.layer.cornerRadius = selectedBarHasRoundedCorners ? selectedBarHeight / 2 : 0
     }
 
     override open func layoutSubviews() {
