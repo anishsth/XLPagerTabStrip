@@ -72,6 +72,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     public var changeCurrentIndex: ((_ oldCell: ButtonBarViewCell?, _ newCell: ButtonBarViewCell?, _ animated: Bool) -> Void)?
     public var changeCurrentIndexProgressive: ((_ oldCell: ButtonBarViewCell?, _ newCell: ButtonBarViewCell?, _ progressPercentage: CGFloat, _ changeCurrentIndex: Bool, _ animated: Bool) -> Void)?
+    public var firstcellObject: ButtonBarViewCell?
 
     @IBOutlet public weak var buttonBarView: ButtonBarView!
 
@@ -229,6 +230,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             let oldIndexPath = IndexPath(item: currentIndex != fromIndex ? fromIndex : toIndex, section: 0)
             let newIndexPath = IndexPath(item: currentIndex, section: 0)
 
+            firstcellObject = buttonBarView.cellForItem(at: IndexPath(row: 0, section: 0)) as? ButtonBarViewCell
+
             let cells = cellForItems(at: [oldIndexPath, newIndexPath], reloadIfNotVisible: collectionViewDidLoad)
             changeCurrentIndex(cells.first!, cells.last!, true)
         }
@@ -240,6 +243,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         if let changeCurrentIndexProgressive = changeCurrentIndexProgressive {
             let oldIndexPath = IndexPath(item: currentIndex != fromIndex ? fromIndex : toIndex, section: 0)
             let newIndexPath = IndexPath(item: currentIndex, section: 0)
+
+            firstcellObject = buttonBarView.cellForItem(at: IndexPath(row: 0, section: 0)) as? ButtonBarViewCell
 
             let cells = cellForItems(at: [oldIndexPath, newIndexPath], reloadIfNotVisible: collectionViewDidLoad)
             changeCurrentIndexProgressive(cells.first!, cells.last!, progressPercentage, indexWasChanged, true)
@@ -325,6 +330,9 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
         if let highlightedImage = indicatorInfo.highlightedImage {
             cell.imageView.highlightedImage = highlightedImage
+        }
+        if let count = indicatorInfo.count {
+            cell.count = count
         }
 
         configureCell(cell, indicatorInfo: indicatorInfo)
