@@ -29,6 +29,19 @@ open class ButtonBarViewCell: UICollectionViewCell {
 
     @IBOutlet open var imageView: UIImageView!
     @IBOutlet open var label: UILabel!
+    @IBOutlet open var countlabel: UILabel!
+    @IBOutlet open var countView: UIView!
+    
+    open var count: Int = 0 {
+        didSet {
+            if count == 0 {
+                countView.isHidden = true
+            } else {
+                countView.isHidden = false
+                countlabel.text = "\(count)"
+            }
+        }
+    }
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

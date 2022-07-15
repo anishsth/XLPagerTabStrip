@@ -31,6 +31,7 @@ public struct IndicatorInfo {
     public var highlightedImage: UIImage?
     public var accessibilityLabel: String?
     public var userInfo: Any?
+    public var count: Int?
     
     public init(title: String?) {
         self.title = title
@@ -41,6 +42,12 @@ public struct IndicatorInfo {
         self.image = image
         self.highlightedImage = highlightedImage
         self.userInfo = userInfo
+    }
+    
+    public init(title: String?, count: Int? = nil) {
+        self.title = title
+        self.accessibilityLabel = title
+        self.count = count
     }
     
     public init(title: String?, image: UIImage?, highlightedImage: UIImage? = nil, userInfo: Any? = nil) {
